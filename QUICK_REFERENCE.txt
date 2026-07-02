@@ -1,0 +1,179 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    BACKEND QUICK REFERENCE CARD                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌─ YOUR SYSTEM INFO ─────────────────────────────────────────────────────────┐
+│ OS:           Windows 10/11                                                 │
+│ Node.js:      v23.5.0                                                       │
+│ npm:          v10.7.0                                                       │
+│ Project Path: C:\Users\purna\OneDrive\Desktop\skill palwar\...             │
+│ Status:       ✅ READY TO GO                                                │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ PACKAGE.JSON ─────────────────────────────────────────────────────────────┐
+│ {                                                                            │
+│   "name": "movie-recommendation-system",                                    │
+│   "version": "1.0.0",                                                       │
+│   "main": "server.js",                                                      │
+│   "scripts": {                                                              │
+│     "start": "node server.js",      ← Main command to run                  │
+│     "seed": "node seed.js",         ← Setup database                       │
+│     "dev": "npx lite-server"        ← Old dev server (optional)            │
+│   },                                                                         │
+│   "dependencies": {                                                         │
+│     "express": "^4.18.2",           ← Web framework                        │
+│     "cors": "^2.8.5",               ← Cross-origin support                │
+│     "sqlite3": "^5.1.6",            ← Database driver                     │
+│     "uuid": "^9.0.0"                ← Session ID generator                │
+│   },                                                                         │
+│   "devDependencies": {                                                      │
+│     "lite-server": "^2.6.1"         ← Optional live-reload                │
+│   }                                                                          │
+│ }                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 🎯 QUICK COMMANDS ────────────────────────────────────────────────────────┐
+│                                                                              │
+│  Start Backend (MAIN)                                                       │
+│  ──────────────────────────────────────────────────────                    │
+│  $ npm start                                                                 │
+│                                                                              │
+│  Setup Database (First Time Only)                                           │
+│  ──────────────────────────────────────────────────────                    │
+│  $ npm run seed                                                              │
+│                                                                              │
+│  View Installed Packages                                                    │
+│  ──────────────────────────────────────────────────────                    │
+│  $ npm list                                                                  │
+│                                                                              │
+│  Check Project Size                                                         │
+│  ──────────────────────────────────────────────────────                    │
+│  $ dir /s C:\Users\purna\OneDrive\Desktop\skill\ palwar\...               │
+│                                                                              │
+│  Reinstall Dependencies (if broken)                                        │
+│  ──────────────────────────────────────────────────────                    │
+│  $ npm install                                                               │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 📁 KEY FILES ─────────────────────────────────────────────────────────────┐
+│                                                                              │
+│  File                 Size    Purpose              Status                  │
+│  ─────────────────────────────────────────────────────────────────         │
+│  server.js            1 KB    Entry point         ✅ Active                 │
+│  routes.js            5 KB    API endpoints       ✅ Active                 │
+│  database.js          8 KB    Database layer      ✅ Active                 │
+│  api-client.js        3 KB    Frontend HTTP       ✅ Active                 │
+│  seed.js              12 KB   Data loader         ✅ Executed               │
+│  movies.db            50 KB   SQLite database     ✅ Populated              │
+│  package.json         2 KB    Dependencies        ✅ Installed              │
+│  node_modules/        250 MB  Packages            ✅ Ready                  │
+│  index.html           45 KB   Frontend UI         ✅ Served                 │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 🌐 API ENDPOINTS ─────────────────────────────────────────────────────────┐
+│                                                                              │
+│  Base URL: http://localhost:5000/api                                        │
+│                                                                              │
+│  Movies                                                                     │
+│  ───────────────────────────────────────────────────────────               │
+│    GET  /movies              → All 50 movies                                │
+│    GET  /movies/1            → Single movie by ID                           │
+│    GET  /search?q=Baahubali  → Search by title                             │
+│    GET  /genre/Action        → Movies by genre                              │
+│    GET  /filter/rating?min=7&max=10 → Filter by rating                    │
+│                                                                              │
+│  Watchlist                                                                  │
+│  ───────────────────────────────────────────────────────────               │
+│    GET  /watchlist           → Get user's watchlist                         │
+│    POST /watchlist/add       → Add movie (movieId in body)                  │
+│    POST /watchlist/remove    → Remove movie (movieId in body)               │
+│                                                                              │
+│  Seen Tracking                                                              │
+│  ───────────────────────────────────────────────────────────               │
+│    GET  /seen                → Get seen movies (array of IDs)               │
+│    POST /seen/toggle         → Toggle seen status (movieId in body)        │
+│                                                                              │
+│  Statistics                                                                 │
+│  ───────────────────────────────────────────────────────────               │
+│    GET  /stats               → User stats (totals, averages)                │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 💾 DATABASE INFO ─────────────────────────────────────────────────────────┐
+│                                                                              │
+│  Database File:  movies.db                                                  │
+│  Location:       C:\Users\purna\OneDrive\Desktop\skill palwar\...          │
+│  Type:           SQLite3                                                    │
+│  Size:           ~50 KB                                                     │
+│                                                                              │
+│  Tables:                                                                    │
+│  ├─ movies (50 rows)       - Static movie data (read-only)                 │
+│  ├─ watchlist (per-user)   - Dynamic user watchlists                       │
+│  └─ seen_movies (per-user) - Dynamic seen tracking                         │
+│                                                                              │
+│  To View Database:                                                          │
+│  ├─ Install: SQLite Browser (https://sqlitebrowser.org/)                   │
+│  ├─ Open: File → Open → movies.db                                          │
+│  ├─ Browse: Click table names to view data                                 │
+│  └─ Export: Right-click → Export as CSV/JSON                               │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 🎯 TYPICAL WORKFLOW ──────────────────────────────────────────────────────┐
+│                                                                              │
+│  Day 1 - Initial Setup                                                     │
+│  ─────────────────────                                                     │
+│  1. npm install             (Download packages - DONE ✅)                   │
+│  2. npm run seed            (Setup database - DONE ✅)                      │
+│  3. npm start               (Start server)                                   │
+│                                                                              │
+│  Day 2+ - Normal Use                                                        │
+│  ──────────────────                                                        │
+│  1. npm start               (Open terminal in project)                      │
+│  2. Open browser            (Go to http://localhost:5000)                   │
+│  3. Interact with app       (Click, search, watchlist)                      │
+│  4. Data persists           (Saved in movies.db)                            │
+│  5. Ctrl+C                  (Stop server when done)                         │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ ✨ WHAT'S WORKING ────────────────────────────────────────────────────────┐
+│                                                                              │
+│  ✅ Backend API              ✅ Database Layer                               │
+│  ✅ Express Server           ✅ SQLite Storage                               │
+│  ✅ CORS Middleware          ✅ User Sessions                                │
+│  ✅ 50 Movies Loaded         ✅ Watchlist Feature                            │
+│  ✅ Seen Tracking            ✅ Search & Filter                              │
+│  ✅ Frontend Connected       ✅ Real-time Sync                               │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 📦 ALTERNATIVES (If Issues) ─────────────────────────────────────────────┐
+│                                                                              │
+│  If port 5000 is blocked:                                                   │
+│  $ PORT=8000 npm start                                                      │
+│                                                                              │
+│  If database is corrupted:                                                  │
+│  $ rm movies.db                                                              │
+│  $ npm run seed                                                              │
+│                                                                              │
+│  If packages are broken:                                                    │
+│  $ rm -r node_modules package-lock.json                                     │
+│  $ npm install                                                               │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 🔗 USEFUL LINKS ──────────────────────────────────────────────────────────┐
+│                                                                              │
+│  Node.js Docs:           https://nodejs.org/docs/                           │
+│  Express Docs:           https://expressjs.com/                             │
+│  SQLite3 Docs:           https://www.sqlite.org/docs.html                   │
+│  SQLite Browser:         https://sqlitebrowser.org/                         │
+│  Postman API Tool:       https://www.postman.com/                           │
+│                                                                              │
+└────────────────────────────────────────────────────────────────────────────┘
+
+Generated: June 19, 2026
+Status: ✅ Ready for Production Use

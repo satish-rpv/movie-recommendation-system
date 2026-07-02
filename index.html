@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telugu Movie Recommendation System</title>
+  <style>
+    :root {
+      --bg-1: #0b1020;
+      --bg-2: #141a31;
+      --panel: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #edf1ff;
+      --muted: #aab3d4;
+      --accent: #ffb347;
+      --accent-2: #ffd86b;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(255, 179, 71, 0.18), transparent 28%),
+        linear-gradient(135deg, var(--bg-1), #11182d 40%, var(--bg-2));
+      color: var(--text);
+      padding: 28px 18px 40px;
+    }
+
+    .shell { max-width: 1180px; margin: 0 auto; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .hero-card,
+    .panel,
+    .module-card,
+    .movie-card,
+    .spotlight-card {
+      background: linear-gradient(180deg, var(--panel), rgba(255,255,255,0.035));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-card {
+      padding: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -60px auto;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,216,107,0.24), transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 179, 71, 0.12);
+      color: var(--accent-2);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.05;
+      background: linear-gradient(90deg, #fff7d6, var(--accent), #fff7d6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 60ch;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.98rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn,
+    .chip,
+    .tab-btn,
+    .controls select,
+    .controls input,
+    .controls button {
+      border-radius: 12px;
+      font: inherit;
+    }
+
+    .btn {
+      padding: 11px 16px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #14172a;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: 0.94; }
+    .btn.secondary {
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .hero-side {
+      display: grid;
+      grid-template-rows: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .mini-panel { padding: 18px; display: grid; align-content: start; gap: 8px; }
+    .mini-panel h3 { margin: 0; font-size: 0.95rem; color: #fff; }
+    .mini-panel p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 14px 0 18px;
+    }
+
+    .stat {
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid var(--border);
+    }
+
+    .stat .value {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .stat .label { color: var(--muted); font-size: 0.88rem; }
+
+    .panel { padding: 18px; margin-bottom: 18px; }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .section-label {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0;
+    }
+
+    .section-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .module-card { padding: 16px; min-height: 220px; }
+    .module-card h3 { margin: 0 0 6px; font-size: 1rem; }
+    .module-card p { margin: 0 0 14px; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+
+    .module-list { display: grid; gap: 10px; }
+
+    .module-item {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .module-item img {
+      width: 44px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      display: block;
+      background: #14182a;
+    }
+
+    .module-item strong {
+      display: block;
+      font-size: 0.88rem;
+      line-height: 1.35;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    .module-item span { font-size: 0.8rem; color: var(--muted); }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1.3fr 0.8fr 0.8fr 1fr auto auto;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .controls select,
+    .controls input {
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border: 1px solid var(--border);
+      outline: none;
+    }
+
+    .controls input::placeholder { color: #8e97b9; }
+
+    .controls select:focus,
+    .controls input:focus {
+      border-color: rgba(255, 216, 107, 0.6);
+      box-shadow: 0 0 0 4px rgba(255, 179, 71, 0.1);
+    }
+
+    .controls button {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 800;
+      border: none;
+    }
+
+    #applyBtn {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #14172a;
+    }
+
+    #resetBtn {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .genre-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 10px 0 18px;
+    }
+
+    .chip {
+      padding: 9px 13px;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .chip:hover,
+    .chip.active {
+      background: rgba(255, 179, 71, 0.16);
+      border-color: rgba(255, 216, 107, 0.45);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .watchlist-toggle {
+      display: flex;
+      gap: 10px;
+      margin: 0 0 18px;
+    }
+
+    .tab-btn {
+      padding: 12px 18px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active-tab {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #14172a;
+      border-color: transparent;
+    }
+
+    .count-pill {
+      display: inline-block;
+      margin-left: 7px;
+      min-width: 24px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #ff5f6d;
+      color: #fff;
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    .spotlight-wrap { margin-bottom: 18px; }
+
+    .spotlight-card {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 18px;
+      overflow: hidden;
+    }
+
+    .spotlight-card img {
+      width: 100%;
+      height: 100%;
+      min-height: 220px;
+      object-fit: cover;
+      display: block;
+      background: #14182a;
+    }
+
+    .spotlight-content {
+      padding: 18px 18px 18px 0;
+      display: grid;
+      gap: 10px;
+      align-content: center;
+    }
+
+    .spotlight-content h3 { margin: 0; font-size: 1.2rem; }
+    .spotlight-content p { margin: 0; color: var(--muted); line-height: 1.65; font-size: 0.92rem; }
+
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .movie-card {
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 60px rgba(0,0,0,0.42);
+    }
+
+    .movie-poster-wrap {
+      position: relative;
+      height: 340px;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .movie-poster-wrap img,
+    .movie-poster-placeholder {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #11172a;
+    }
+
+    .movie-poster-wrap::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 110px;
+      background: linear-gradient(to top, rgba(11,16,32,0.92), transparent);
+      pointer-events: none;
+    }
+
+    .movie-poster-placeholder {
+      display: grid;
+      place-items: center;
+      font-size: 3rem;
+      color: #45506f;
+    }
+
+    .movie-actions {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 8px;
+      z-index: 2;
+    }
+
+    .icon-btn,
+    .remove-btn {
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      font-size: 1.1rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .icon-btn.active {
+      background: rgba(255, 95, 109, 0.95);
+      animation: pulse 0.3s ease;
+    }
+
+    .remove-btn {
+      padding: 9px 12px;
+      background: rgba(255, 95, 109, 0.95);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.78rem;
+    }
+
+    .icon-btn:hover,
+    .remove-btn:hover { transform: scale(1.05); }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    .movie-info { padding: 16px 16px 18px; }
+    .movie-title {
+      margin: 8px 0 10px;
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.4;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .badge-genre { background: rgba(165, 105, 255, 0.16); color: #d8b8ff; }
+    .badge-rating { background: rgba(255, 179, 71, 0.18); color: #ffe2b0; }
+    .badge-year { background: rgba(74, 222, 128, 0.14); color: #a8f5c2; }
+    .badge-seen { background: rgba(100, 200, 255, 0.18); color: #a8d5ff; }
+
+    .help-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+    }
+
+    .help-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .help-content {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+    }
+
+    .help-close {
+      float: right;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .help-close:hover {
+      color: var(--accent);
+    }
+
+    .help-title {
+      clear: both;
+      margin: 0 0 20px;
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    .shortcut-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .shortcut-item:last-child {
+      border-bottom: none;
+    }
+
+    .shortcut-key {
+      background: rgba(255, 179, 71, 0.2);
+      color: var(--accent);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      white-space: nowrap;
+      font-size: 0.85rem;
+    }
+
+    .shortcut-desc {
+      flex: 1;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .movie-meta {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.8;
+    }
+
+    .rating-bar {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .rating-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .no-results {
+      padding: 30px 16px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(255,255,255,0.14);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* High contrast accessibility mode */
+    .high-contrast {
+      --panel: rgba(0,0,0,0.65);
+      --border: rgba(255,255,255,0.95);
+      --text: #ffffff;
+      --muted: #f0f4ff;
+      --accent: #ffb347;
+      --accent-2: #ffd86b;
+      background: #0b0b0d;
+    }
+
+    .movie-card:focus-within {
+      outline: 3px solid rgba(255,216,107,0.25);
+      outline-offset: 4px;
+    }
+
+    /* Compact view for higher visibility density */
+    .compact .movie-poster-wrap { height: 180px; }
+    .compact .movie-title { font-size: 0.95rem; }
+    .compact .movie-meta, .compact .rating-bar { display: none; }
+
+    .genre-section,
+    .watchlist-section { margin-bottom: 18px; }
+
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      color: #8490b7;
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 1060px) {
+      .hero,
+      .module-grid,
+      .stats-grid,
+      .controls,
+      .spotlight-card {
+        grid-template-columns: 1fr 1fr;
+      }
+      .controls { grid-template-columns: 1fr 1fr; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-side { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 18px 12px 30px; }
+      .hero-side,
+      .stats-grid,
+      .module-grid,
+      .spotlight-card,
+      .controls {
+        grid-template-columns: 1fr;
+      }
+      .controls button,
+      .tab-btn,
+      .chip,
+      .btn { width: 100%; justify-content: center; }
+      .watchlist-toggle,
+      .hero-actions { flex-direction: column; }
+      .movie-poster-wrap { height: 300px; }
+      .spotlight-content { padding: 0 18px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">Telugu Cinema Dashboard</div>
+        <h1>Discover, filter, and save your favorite Telugu movies</h1>
+        <p class="subtitle">
+          Explore a refreshed movie experience with smart modules, genre shortcuts,
+          watchlist support, and cleaner cards for the latest recommendations.
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href="#browse">🎬 Browse Movies</a>
+          <a class="btn secondary" href="#modules">✨ Featured Modules</a>
+        </div>
+      </div>
+
+      <div class="hero-side">
+        <div class="hero-card mini-panel">
+          <h3>Fresh layout</h3>
+          <p>Updated movie cards, spotlight panel, and quick filters for a more modern browsing flow.</p>
+        </div>
+        <div class="hero-card mini-panel">
+          <h3>Saved watchlist</h3>
+          <p>Tap the heart icon on any movie to save it locally and revisit it in your watchlist tab.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-grid" id="statsGrid"></section>
+
+    <section class="panel" id="modules">
+      <div class="section-header">
+        <div>
+          <h2 class="section-label">Featured modules</h2>
+          <p class="section-subtitle">A few curated views to make the frontend feel more complete and dynamic.</p>
+        </div>
+      </div>
+      <div class="module-grid" id="moduleGrid"></div>
+    </section>
+
+    <section class="panel" id="browse">
+      <div class="section-header">
+        <div>
+          <h2 class="section-label">Browse controls</h2>
+          <p class="section-subtitle">Use filters, quick genre chips, and sorting to narrow down the catalog.</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <select id="genreFilter">
+          <option value="">All Genres</option>
+        </select>
+
+        <select id="sortFilter">
+          <option value="rating-desc">Sort: Highest Rating</option>
+          <option value="rating-asc">Sort: Lowest Rating</option>
+          <option value="year-desc">Sort: Newest First</option>
+          <option value="year-asc">Sort: Oldest First</option>
+          <option value="title-asc">Sort: Title A → Z</option>
+        </select>
+
+        <input type="number" id="minRating" placeholder="Min rating, e.g. 8.0" step="0.1" min="0" max="10" />
+
+        <input type="number" id="yearFilter" placeholder="Year, e.g. 2023" min="1900" max="2030" />
+
+        <input type="text" id="searchBox" placeholder="Search movie title..." />
+
+        <button id="applyBtn">Apply Filters</button>
+        <button id="resetBtn">Reset</button>
+        
+        <!-- Accessibility / visibility controls -->
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input id="contrastToggle" type="checkbox" style="width:18px;height:18px;" />
+          <span style="font-size:0.85rem;color:var(--muted);">High contrast</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;">
+          <input id="compactToggle" type="checkbox" style="width:18px;height:18px;" />
+          <span style="font-size:0.85rem;color:var(--muted);">Compact view</span>
+        </label>
+      </div>
+
+      <div class="genre-chips" id="genreChips"></div>
+
+      <div class="watchlist-toggle">
+        <button class="tab-btn active-tab" id="tabBrowse">🎬 Browse Movies</button>
+        <button class="tab-btn" id="tabWatchlist">❤️ My Watchlist <span class="count-pill" id="wlCount">0</span></button>
+      </div>
+
+      <div class="spotlight-wrap" id="spotlightWrap"></div>
+      <div id="movieContainer"></div>
+      <div id="watchlistContainer" style="display:none;"></div>
+    </section>
+
+    <div class="footer">Movie recommendation system frontend refreshed with extra modules and updated card design.</div>
+  </div>
+
+  <div class="help-modal" id="helpModal">
+    <div class="help-content">
+      <button class="help-close" id="helpClose">&times;</button>
+      <h3 class="help-title">Keyboard Shortcuts</h3>
+      <div class="shortcut-item">
+        <span class="shortcut-key">?</span>
+        <span class="shortcut-desc">Show this help dialog</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">Esc</span>
+        <span class="shortcut-desc">Close this dialog</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">Tab</span>
+        <span class="shortcut-desc">Navigate between movies and buttons</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">Enter / Space</span>
+        <span class="shortcut-desc">Activate buttons or expand movie details</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">❤️</span>
+        <span class="shortcut-desc">Add/remove from watchlist</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">👁️</span>
+        <span class="shortcut-desc">Mark as seen/watched</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">🔍</span>
+        <span class="shortcut-desc">Toggle movie synopsis and details</span>
+      </div>
+      <div class="shortcut-item">
+        <span class="shortcut-key">✕</span>
+        <span class="shortcut-desc">Remove from watchlist (in watchlist view)</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Import API client
+    const apiScript = document.createElement('script');
+    apiScript.src = './api-client.js';
+    document.head.appendChild(apiScript);
+  </script>
+
+  <script>
+    // Wait for API client to load
+    let movies = [];
+    let watchlist = [];
+    let seenMovies = [];
+
+    async function initializeApp() {
+      try {
+        // Wait for api to be available
+        while (typeof api === 'undefined') {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        // Load movies from backend
+        console.log('📡 Loading movies from backend...');
+        movies = await api.getMovies();
+        console.log(`✓ Loaded ${movies.length} movies`);
+
+        // Load user's watchlist and seen movies
+        watchlist = await api.getWatchlist();
+        seenMovies = await api.getSeen();
+
+        console.log(`✓ Loaded watchlist (${watchlist.length} items) and seen movies (${seenMovies.length} items)`);
+
+        // Initialize UI
+        initializeUI();
+      } catch (error) {
+        console.error('Error initializing app:', error);
+        // Fallback: show connection error
+        document.getElementById('movieContainer').innerHTML = `
+          <div class="no-results">
+            <p>❌ Unable to connect to backend server</p>
+            <p style="font-size: 0.9rem; color: var(--muted);">Make sure the backend is running on <a href="http://localhost:5000" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: underline;">http://localhost:5000</a></p>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-top: 16px;">Run: <code style="background: rgba(0,0,0,0.2); padding: 4px 8px;">npm start</code></p>
+          </div>
+        `;
+      }
+    }
+
+    function initializeUI() {
+      const genreFilter = document.getElementById("genreFilter");
+      const sortFilter = document.getElementById("sortFilter");
+      const minRating = document.getElementById("minRating");
+      const yearFilter = document.getElementById("yearFilter");
+      const searchBox = document.getElementById("searchBox");
+      const applyBtn = document.getElementById("applyBtn");
+      const resetBtn = document.getElementById("resetBtn");
+
+    const movieContainer = document.getElementById("movieContainer");
+    const watchlistContainer = document.getElementById("watchlistContainer");
+    const tabBrowse = document.getElementById("tabBrowse");
+    const tabWatchlist = document.getElementById("tabWatchlist");
+    const wlCount = document.getElementById("wlCount");
+    const statsGrid = document.getElementById("statsGrid");
+    const moduleGrid = document.getElementById("moduleGrid");
+    const genreChips = document.getElementById("genreChips");
+    const spotlightWrap = document.getElementById("spotlightWrap");
+
+    function isInWatchlist(id) {
+      return watchlist.some(movie => movie.id === id);
+    }
+
+    async function toggleWatchlist(movie) {
+      try {
+        if (isInWatchlist(movie.id)) {
+          await api.removeFromWatchlist(movie.id);
+        } else {
+          await api.addToWatchlist(movie.id);
+        }
+        watchlist = await api.getWatchlist();
+        renderStats();
+        renderModules();
+        applyFilters();
+        renderWatchlist();
+      } catch (error) {
+        console.error('Error toggling watchlist:', error);
+        alert('Failed to update watchlist');
+      }
+    }
+
+    async function removeFromWatchlist(id) {
+      try {
+        await api.removeFromWatchlist(id);
+        watchlist = await api.getWatchlist();
+        renderStats();
+        renderModules();
+        applyFilters();
+        renderWatchlist();
+      } catch (error) {
+        console.error('Error removing from watchlist:', error);
+        alert('Failed to remove from watchlist');
+      }
+    }
+
+    async function toggleSeen(id) {
+      try {
+        await api.toggleSeen(id);
+        seenMovies = await api.getSeen();
+        renderStats();
+        applyFilters();
+      } catch (error) {
+        console.error('Error toggling seen:', error);
+        alert('Failed to update seen status');
+      }
+    }
+
+    function isMovieSeen(id) {
+      return seenMovies.includes(id);
+    }
+
+    function safeImage(movie) {
+      return `<img loading="lazy" src="${movie.image}" alt="${movie.title} poster" onerror="this.outerHTML='<div class=movie-poster-placeholder>🎬</div>'" />`;
+    }
+
+    function renderStats() {
+      const total = movies.length;
+      const watchlistCount = watchlist.length;
+      const seenCount = seenMovies.length;
+      const avgRating = (movies.reduce((sum, movie) => sum + movie.rating, 0) / total).toFixed(1);
+      const genres = new Set(movies.map(movie => movie.genre)).size;
+      const newest = Math.max(...movies.map(movie => movie.year));
+
+      wlCount.textContent = watchlistCount;
+
+      statsGrid.innerHTML = `
+        <div class="stat"><span class="value">${total}</span><span class="label">Total movies</span></div>
+        <div class="stat"><span class="value">${avgRating}</span><span class="label">Average rating</span></div>
+        <div class="stat"><span class="value">${genres}</span><span class="label">Genres available</span></div>
+        <div class="stat"><span class="value">${watchlistCount}</span><span class="label">Saved watchlist</span></div>
+        <div class="stat"><span class="value">${seenCount}</span><span class="label">Movies seen</span></div>
+      `;
+
+      const spotlight = [...movies].sort((a, b) => b.rating - a.rating)[0];
+      spotlightWrap.innerHTML = `
+        <div class="spotlight-card">
+          ${safeImage(spotlight)}
+          <div class="spotlight-content">
+            <div class="badge-row">
+              <span class="badge badge-genre">🌟 Spotlight</span>
+              <span class="badge badge-rating">⭐ ${spotlight.rating}</span>
+              <span class="badge badge-year">📅 ${spotlight.year}</span>
+            </div>
+            <h3>${spotlight.title}</h3>
+            <p>The current highest-rated title in the catalog and a great starting point for browsing the collection.</p>
+            <p><strong>Newest release year in the catalog:</strong> ${newest}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function populateGenres() {
+      const genres = [...new Set(movies.map(movie => movie.genre))].sort();
+
+      genres.forEach(genre => {
+        const option = document.createElement("option");
+        option.value = genre;
+        option.textContent = genre;
+        genreFilter.appendChild(option);
+      });
+
+      genreChips.innerHTML = `<button class="chip active" data-genre="">All</button>`;
+      genres.forEach(genre => {
+        const button = document.createElement("button");
+        button.className = "chip";
+        button.dataset.genre = genre;
+        button.textContent = genre;
+        genreChips.appendChild(button);
+      });
+
+      genreChips.querySelectorAll(".chip").forEach(button => {
+        button.addEventListener("click", () => {
+          genreChips.querySelectorAll(".chip").forEach(chip => chip.classList.remove("active"));
+          button.classList.add("active");
+          genreFilter.value = button.dataset.genre;
+          applyFilters();
+        });
+      });
+    }
+
+    function getSortedMovies(list) {
+      const sort = sortFilter.value;
+      const moviesCopy = [...list];
+
+      if (sort === "rating-asc") return moviesCopy.sort((a, b) => a.rating - b.rating);
+      if (sort === "year-desc") return moviesCopy.sort((a, b) => b.year - a.year);
+      if (sort === "year-asc") return moviesCopy.sort((a, b) => a.year - b.year);
+      if (sort === "title-asc") return moviesCopy.sort((a, b) => a.title.localeCompare(b.title));
+      return moviesCopy.sort((a, b) => b.rating - a.rating);
+    }
+
+    function createMovieCard(movie, isWatchlistView = false) {
+      const inWatchlist = isInWatchlist(movie.id);
+      const isSeen = isMovieSeen(movie.id);
+      const card = document.createElement("div");
+      card.className = "movie-card";
+
+      const detailsId = `details-${movie.id}`;
+      card.innerHTML = `
+        <div class="movie-poster-wrap">
+          <div class="movie-actions">
+            ${isWatchlistView
+              ? `<button class="remove-btn" aria-label="Remove ${movie.title} from watchlist">✕ Remove</button>`
+              : `<button class="icon-btn ${inWatchlist ? "active" : ""}" aria-pressed="${inWatchlist}" aria-label="${inWatchlist ? 'Remove' : 'Add'} ${movie.title} to watchlist">❤️</button>`
+            }
+            <button class="icon-btn ${isSeen ? "active" : ""}" aria-pressed="${isSeen}" aria-label="${isSeen ? 'Mark as unwatched' : 'Mark as seen'}: ${movie.title}">👁️</button>
+            <button class="icon-btn details-btn" aria-expanded="false" aria-controls="${detailsId}" aria-label="Toggle details for ${movie.title}">🔍</button>
+          </div>
+          ${safeImage(movie)}
+        </div>
+        <div class="movie-info">
+          <div class="badge-row">
+            <span class="badge badge-genre">${movie.genre}</span>
+            <span class="badge badge-rating">⭐ ${movie.rating}</span>
+            ${isSeen ? '<span class="badge badge-seen">✓ Seen</span>' : `<span class="badge badge-year">📅 ${movie.year}</span>`}
+          </div>
+          <div class="movie-title" tabindex="0">${movie.title}</div>
+          <div class="movie-meta">${movie.year} • ${movie.genre} film</div>
+          <div id="${detailsId}" class="movie-details" hidden>
+            <p style="margin:8px 0;color:var(--muted);"><strong>Synopsis:</strong> ${movie.synopsis || 'No synopsis available.'}</p>
+            <p style="margin:8px 0;color:var(--muted);font-size:0.9rem;"><strong>Release:</strong> ${movie.year} | <strong>Genre:</strong> ${movie.genre} | <strong>Rating:</strong> ${movie.rating}/10</p>
+          </div>
+          <div class="rating-bar"><div class="rating-fill" style="width:${movie.rating * 10}%"></div></div>
+        </div>
+      `;
+
+      // Watchlist / remove handlers (keyboard accessible)
+      if (isWatchlistView) {
+        const rem = card.querySelector(".remove-btn");
+        rem.addEventListener("click", () => removeFromWatchlist(movie.id));
+        rem.addEventListener("keydown", e => { if (e.key === 'Enter' || e.key === ' ') removeFromWatchlist(movie.id); });
+      } else {
+        const watchBtn = card.querySelector(".icon-btn");
+        watchBtn.addEventListener("click", () => toggleWatchlist(movie));
+        watchBtn.addEventListener("keydown", e => { if (e.key === 'Enter' || e.key === ' ') toggleWatchlist(movie); });
+      }
+
+      // Seen toggle handler
+      const allIconBtns = card.querySelectorAll(".icon-btn:not(.details-btn)");
+      const seenBtn = allIconBtns[allIconBtns.length - 1]; // Eye button is always the last non-details icon-btn
+      seenBtn.addEventListener("click", async () => {
+        await toggleSeen(movie.id);
+        renderFeaturedModules();
+        applyFilters();
+        if (watchlistContainer.style.display !== "none") {
+          renderWatchlist();
+        }
+      });
+      seenBtn.addEventListener("keydown", async e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          await toggleSeen(movie.id);
+          renderFeaturedModules();
+          applyFilters();
+          if (watchlistContainer.style.display !== "none") {
+            renderWatchlist();
+          }
+        }
+      });
+
+      // details toggle
+      const detailsBtn = card.querySelector('.details-btn');
+      const detailsEl = card.querySelector('.movie-details');
+      const titleEl = card.querySelector('.movie-title');
+      function toggleDetails() {
+        const expanded = detailsBtn.getAttribute('aria-expanded') === 'true';
+        detailsBtn.setAttribute('aria-expanded', String(!expanded));
+        detailsEl.hidden = expanded;
+        if (!expanded) detailsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      detailsBtn.addEventListener('click', toggleDetails);
+      detailsBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDetails(); } });
+      titleEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDetails(); } });
+
+      return card;
+    }
+
+    function renderFeaturedModules() {
+      const topRated = [...movies].sort((a, b) => b.rating - a.rating).slice(0, 4);
+      const recent = [...movies].filter(movie => movie.year >= 2021).sort((a, b) => b.rating - a.rating).slice(0, 4);
+      const genreLeaders = Object.values(
+        movies.reduce((acc, movie) => {
+          if (!acc[movie.genre] || acc[movie.genre].rating < movie.rating) acc[movie.genre] = movie;
+          return acc;
+        }, {})
+      ).sort((a, b) => b.rating - a.rating).slice(0, 4);
+      const wl = [...watchlist].sort((a, b) => b.rating - a.rating).slice(0, 4);
+
+      const moduleData = [
+        { title: "Top Rated", desc: "The strongest titles in the catalog, ranked by rating.", items: topRated },
+        { title: "Recent Releases", desc: "Fresh picks released from 2021 onward.", items: recent },
+        { title: "Genre Leaders", desc: "Best performer from each genre in the current set.", items: genreLeaders },
+        { title: "My Watchlist", desc: "Saved movies from local storage. Add a few to fill this module.", items: wl },
+      ];
+
+      moduleGrid.innerHTML = moduleData.map(module => `
+        <div class="module-card">
+          <h3>${module.title}</h3>
+          <p>${module.desc}</p>
+          <div class="module-list">
+            ${module.items.length
+              ? module.items.map(movie => `
+                <div class="module-item">
+                  <img src="${movie.image}" alt="${movie.title}" onerror="this.outerHTML='<div class=movie-poster-placeholder style=height:60px;font-size:1.1rem;>🎬</div>'" />
+                  <div>
+                    <strong>${movie.title}</strong>
+                    <span>${movie.genre} • ⭐ ${movie.rating} • ${movie.year}</span>
+                  </div>
+                </div>
+              `).join("")
+              : `<div class="no-results" style="padding:18px;">No saved titles yet.</div>`
+            }
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function createGenreSection(genre, list) {
+      const section = document.createElement("div");
+      section.className = "genre-section";
+
+      const header = document.createElement("div");
+      header.className = "section-header";
+      header.innerHTML = `
+        <div>
+          <h2 class="section-label">${genre} <span style="color:var(--muted);font-weight:700;">(${list.length})</span></h2>
+          <p class="section-subtitle">Sorted according to the current control settings.</p>
+        </div>
+      `;
+      section.appendChild(header);
+
+      const grid = document.createElement("div");
+      grid.className = "movie-grid";
+      list.forEach(movie => grid.appendChild(createMovieCard(movie)));
+      section.appendChild(grid);
+
+      return section;
+    }
+
+    function applyFilters() {
+      let results = [...movies];
+
+      const genre = genreFilter.value;
+      if (genre) results = results.filter(movie => movie.genre === genre);
+
+      const rating = parseFloat(minRating.value);
+      if (!Number.isNaN(rating)) results = results.filter(movie => movie.rating >= rating);
+
+      const year = parseInt(yearFilter.value, 10);
+      if (!Number.isNaN(year)) results = results.filter(movie => movie.year === year);
+
+      const keyword = searchBox.value.trim().toLowerCase();
+      if (keyword) results = results.filter(movie => movie.title.toLowerCase().includes(keyword));
+
+      results = getSortedMovies(results);
+
+      const grouped = results.reduce((acc, movie) => {
+        if (!acc[movie.genre]) acc[movie.genre] = [];
+        acc[movie.genre].push(movie);
+        return acc;
+      }, {});
+
+      movieContainer.innerHTML = "";
+      const sortedGenres = Object.keys(grouped).sort();
+
+      if (!sortedGenres.length) {
+        movieContainer.innerHTML = '<div class="no-results">No movies match your filters.</div>';
+        return;
+      }
+
+      sortedGenres.forEach(genreName => movieContainer.appendChild(createGenreSection(genreName, grouped[genreName])));
+    }
+
+    function renderWatchlist() {
+      const list = [...watchlist].sort((a, b) => b.rating - a.rating);
+      watchlistContainer.innerHTML = "";
+
+      const header = document.createElement("div");
+      header.className = "section-header";
+      header.innerHTML = `
+        <div>
+          <h2 class="section-label">My Watchlist <span style="color:var(--muted);font-weight:700;">(${list.length})</span></h2>
+          <p class="section-subtitle">Saved locally in the browser for quick revisit later.</p>
+        </div>
+      `;
+      watchlistContainer.appendChild(header);
+
+      if (!list.length) {
+        watchlistContainer.innerHTML += '<div class="no-results">Your watchlist is empty. Tap ❤️ on any movie to save it.</div>';
+        return;
+      }
+
+      const grid = document.createElement("div");
+      grid.className = "movie-grid";
+      list.forEach(movie => grid.appendChild(createMovieCard(movie, true)));
+      watchlistContainer.appendChild(grid);
+    }
+
+    applyBtn.addEventListener("click", applyFilters);
+    resetBtn.addEventListener("click", () => {
+      genreFilter.value = "";
+      sortFilter.value = "rating-desc";
+      minRating.value = "";
+      yearFilter.value = "";
+      searchBox.value = "";
+      genreChips.querySelectorAll(".chip").forEach(chip => chip.classList.remove("active"));
+      genreChips.querySelector('.chip[data-genre=""]').classList.add("active");
+      applyFilters();
+    });
+    searchBox.addEventListener("keyup", event => {
+      if (event.key === "Enter") applyFilters();
+    });
+    sortFilter.addEventListener("change", applyFilters);
+
+    tabBrowse.addEventListener("click", () => {
+      tabBrowse.classList.add("active-tab");
+      tabWatchlist.classList.remove("active-tab");
+      movieContainer.style.display = "";
+      spotlightWrap.style.display = "";
+      watchlistContainer.style.display = "none";
+      document.querySelector(".controls").style.display = "grid";
+      document.querySelector(".genre-chips").style.display = "flex";
+      applyFilters();
+    });
+
+    tabWatchlist.addEventListener("click", () => {
+      tabWatchlist.classList.add("active-tab");
+      tabBrowse.classList.remove("active-tab");
+      movieContainer.style.display = "none";
+      spotlightWrap.style.display = "none";
+      watchlistContainer.style.display = "block";
+      document.querySelector(".controls").style.display = "none";
+      document.querySelector(".genre-chips").style.display = "none";
+      renderWatchlist();
+    });
+
+    populateGenres();
+    renderStats();
+    renderFeaturedModules();
+    applyFilters();
+
+    // Accessibility toggles
+    if (contrastToggle) {
+      contrastToggle.addEventListener('change', () => {
+        document.body.classList.toggle('high-contrast', contrastToggle.checked);
+      });
+    }
+    if (compactToggle) {
+      compactToggle.addEventListener('change', () => {
+        document.querySelector('.shell').classList.toggle('compact', compactToggle.checked);
+      });
+    }
+
+    // Keyboard shortcuts
+    const helpModal = document.getElementById("helpModal");
+    const helpClose = document.getElementById("helpClose");
+    
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "?") {
+        e.preventDefault();
+        helpModal.classList.toggle("active");
+      }
+      if (e.key === "Escape") {
+        helpModal.classList.remove("active");
+      }
+    });
+
+    helpClose.addEventListener("click", () => {
+      helpModal.classList.remove("active");
+    });
+
+    helpModal.addEventListener("click", (e) => {
+      if (e.target === helpModal) {
+        helpModal.classList.remove("active");
+      }
+    });
+
+    // Add footer hint about shortcuts
+    document.querySelector(".footer").innerHTML += ' <span style="color: var(--muted); font-size: 0.85rem; float: right; margin-top: 4px;">Press <strong style="color: var(--accent);">?</strong> for keyboard shortcuts</span>';
+
+    } // end of initializeUI function
+
+    // Start the app
+    initializeApp();
+  </script>
+</body>
+</html>

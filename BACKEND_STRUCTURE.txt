@@ -1,0 +1,214 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║         MOVIE RECOMMENDATION SYSTEM - BACKEND STRUCTURE GUIDE               ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📁 PROJECT ROOT DIRECTORY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+movie-recommendation-system/
+│
+├── 🎨 FRONTEND LAYER
+│   ├── index.html           [1300+ lines] Main UI with controls, stats, movie grid
+│   ├── api-client.js        [60 lines]   HTTP wrapper for backend API
+│   ├── movies.js            [Static]     Original local movie data (for reference)
+│   ├── recommender.js       [100 lines]  Filter/search functions
+│   ├── index.js             [CLI demo]   Node.js console examples
+│   └── assets/
+│       └── images/          [50 posters] Movie artwork
+│
+├── 🔧 EXPRESS BACKEND CORE
+│   ├── server.js            [31 lines]   💻 Entry point
+│   │                         ├─ PORT: 5000
+│   │                         ├─ Middleware: CORS, JSON, static files
+│   │                         └─ Routes: /api/*
+│   │
+│   ├── routes.js            [120 lines]  🛣️ API endpoints defined
+│   │                         ├─ GET  /api/movies
+│   │                         ├─ GET  /api/watchlist
+│   │                         ├─ POST /api/watchlist/add
+│   │                         ├─ POST /api/watchlist/remove
+│   │                         ├─ GET  /api/seen
+│   │                         ├─ POST /api/seen/toggle
+│   │                         ├─ GET  /api/stats
+│   │                         ├─ GET  /api/search
+│   │                         ├─ GET  /api/genre/:genre
+│   │                         └─ GET  /api/filter/rating
+│   │
+│   └── database.js          [180 lines]  🗄️ SQLite3 layer
+│       ├─ db connection
+│       ├─ Table creation (movies, watchlist, seen_movies)
+│       ├─ CRUD operations
+│       └─ Query functions
+│
+├── 💾 DATABASE & DATA
+│   ├── movies.db            [~50 KB]    SQLite database file
+│   │                         ├─ Table: movies (50 rows)
+│   │                         ├─ Table: watchlist (per-user)
+│   │                         └─ Table: seen_movies (per-user)
+│   │
+│   └── seed.js              [340 lines] Data population script
+│                             ├─ Creates tables
+│                             └─ Inserts 50 movies
+│
+├── 📦 PACKAGE MANAGEMENT
+│   ├── package.json         [20 lines]  Project config & scripts
+│   │                         ├─ "start": "node server.js"
+│   │                         ├─ "seed": "node seed.js"
+│   │                         ├─ "dev": "npx lite-server"
+│   │                         └─ Dependencies defined
+│   │
+│   ├── package-lock.json    [Auto-generated] Dependency versions locked
+│   │
+│   └── node_modules/        [158 packages installed]
+│       ├─ express/          Web framework
+│       ├─ sqlite3/          Database driver
+│       ├─ cors/             CORS middleware
+│       ├─ uuid/             ID generation
+│       └─ [many dev deps]
+│
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔌 RUNTIME FLOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. USER LAUNCHES BACKEND
+   $ npm start
+   
+   ✓ Reads: server.js → database.js → movies.db
+   ✓ Opens SQLite connection
+   ✓ Creates tables (if needed)
+   ✓ Starts Express server
+   ✓ Listens on http://localhost:5000
+
+2. FRONTEND LOADS
+   ✓ Browser: http://localhost:5000
+   ✓ Loads: index.html
+   ✓ Loads: api-client.js
+   ✓ Generates: unique user_id (stores in localStorage)
+
+3. API COMMUNICATION
+   ✓ Frontend calls: api.getMovies()
+   ✓ API Client: fetch('http://localhost:5000/api/movies')
+   ✓ Express Route: GET /api/movies handler
+   ✓ Database: SELECT * FROM movies
+   ✓ Returns: [50 movies] as JSON
+
+4. DATA STORAGE (User Interactions)
+   ✓ User clicks ❤️ (watchlist)
+   ✓ Frontend calls: api.addToWatchlist(movieId)
+   ✓ Backend POST: /api/watchlist/add with user_id
+   ✓ SQLite: INSERT watchlist (user_id, movie_id)
+   ✓ Data persists between sessions
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ INSTALLED & REQUIRED APPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ALREADY INSTALLED:
+✓ Node.js v23.5.0          (runtime)
+✓ npm 10.7.0               (package manager)
+✓ Express 4.18.2           (in node_modules/)
+✓ SQLite3 5.1.6            (in node_modules/)
+✓ CORS 2.8.5               (in node_modules/)
+✓ UUID 9.0.0               (in node_modules/)
+
+OPTIONAL (Recommended for Development):
+□ VS Code                   (Code editor) - Already have it
+□ SQLite Browser            (View .db file) - Recommended
+□ Postman                   (Test API endpoints) - Optional
+□ Git                       (Version control) - Optional
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 QUICK START COMMANDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Start backend server (on port 5000)
+npm start
+
+# Seed database with 50 movies (one-time setup)
+npm run seed
+
+# Run frontend dev server (on port 3000) - old method
+npm run dev
+
+# Check installed packages
+npm list
+
+# Install new packages if needed
+npm install [package-name]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 DATABASE SCHEMA (movies.db)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE: movies
+  ├─ id (INTEGER PRIMARY KEY)
+  ├─ title (TEXT) - Movie name
+  ├─ genre (TEXT) - Action, Romance, Drama, etc.
+  ├─ rating (REAL) - 1-10 score
+  ├─ year (INTEGER) - Release year
+  ├─ image (TEXT) - Path to poster
+  └─ synopsis (TEXT) - Movie description
+
+TABLE: watchlist
+  ├─ id (INTEGER PRIMARY KEY AUTOINCREMENT)
+  ├─ user_id (TEXT) - Session ID from client
+  ├─ movie_id (INTEGER) - FK: movies.id
+  └─ added_at (TIMESTAMP)
+
+TABLE: seen_movies
+  ├─ id (INTEGER PRIMARY KEY AUTOINCREMENT)
+  ├─ user_id (TEXT) - Session ID from client
+  ├─ movie_id (INTEGER) - FK: movies.id
+  └─ seen_at (TIMESTAMP)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 SESSION MANAGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User Session Flow:
+1. First-time user → API generates unique user_id (UUID v4)
+2. Frontend stores user_id in localStorage (persists)
+3. Each request includes: header "x-user-id": user_id
+4. Backend queries filtered by user_id
+5. Each user gets own watchlist & seen movies
+
+Benefits:
+✓ No login required
+✓ Multiple users can use same app
+✓ Data persists per browser
+✓ Sessions stored in SQLite (not lost)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📈 FILE SIZE ESTIMATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+index.html                ~45 KB
+api-client.js             ~3 KB
+server.js                 ~2 KB
+routes.js                 ~5 KB
+database.js               ~8 KB
+seed.js                   ~12 KB
+movies.db                 ~50 KB
+node_modules/             ~250 MB (can be regenerated from package-lock.json)
+assets/images/            ~5-10 MB (depends on poster sizes)
+
+TOTAL (without node_modules): ~130 KB
+TOTAL (with node_modules):    ~250+ MB
+
+📝 Note: node_modules can be deleted and regenerated with: npm install
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ KEY FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Full-stack application    ✓ Per-user data isolation
+✓ RESTful API               ✓ Real-time synchronization
+✓ SQLite persistence        ✓ Session management
+✓ Search & filtering        ✓ Responsive frontend
+✓ Accessibility ready       ✓ Keyboard shortcuts
+✓ 50 movies pre-loaded      ✓ Watchlist tracking
+✓ Seen/watched status       ✓ User statistics
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,216 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║      INSTALLED DEPENDENCIES & WHAT EACH DOES                                ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ PRODUCTION DEPENDENCIES (Already Installed)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 express@4.18.2
+   📍 Location: node_modules/express/
+   🎯 Purpose: Web framework for Node.js
+   📝 What it does:
+      - Creates HTTP server
+      - Handles routing (GET, POST, etc.)
+      - Middleware support (CORS, JSON parsing)
+      - Serves static files
+   🔗 Used in: server.js
+   💡 Lines of code needed: ~20
+
+📦 cors@2.8.5
+   📍 Location: node_modules/cors/
+   🎯 Purpose: Enable Cross-Origin Resource Sharing
+   📝 What it does:
+      - Allows frontend on port 3000 to call backend on port 5000
+      - Adds CORS headers to responses
+      - Prevents browser "blocked by CORS" errors
+   🔗 Used in: server.js (middleware)
+   💡 Lines of code needed: 1 (app.use(cors()))
+
+📦 sqlite3@5.1.6
+   📍 Location: node_modules/sqlite3/
+   🎯 Purpose: SQLite3 database driver
+   📝 What it does:
+      - Opens connection to movies.db
+      - Executes SQL queries
+      - Manages transactions
+      - Handles errors
+   🔗 Used in: database.js
+   💡 Location on disk: movies.db (~50 KB)
+
+📦 uuid@9.0.0
+   📍 Location: node_modules/uuid/
+   🎯 Purpose: Generate unique identifiers
+   📝 What it does:
+      - Creates unique user IDs (v4 format)
+      - 36-character hex strings
+      - Prevents user session conflicts
+   🔗 Used in: routes.js (middleware)
+   💡 Format: "550e8400-e29b-41d4-a716-446655440000"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 DEVELOPMENT DEPENDENCIES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 lite-server@2.6.1
+   📍 Location: node_modules/lite-server/ (optional)
+   🎯 Purpose: Live development server
+   📝 What it does:
+      - Hot-reload on file changes
+      - Serves static files
+      - Auto-open in browser
+   🔗 Used with: npm run dev
+   💡 Old method - not needed with Express backend
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 PACKAGE.JSON COMMANDS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Command              What it does                          When to use
+─────────────────────────────────────────────────────────────────────────────
+npm start            Runs: node server.js                 ▶️ Production / Normal use
+                     Starts Express on port 5000          
+                     Serves frontend & API                
+
+npm run seed         Runs: node seed.js                   ▶️ First-time setup only
+                     Populates movies.db with 50 films    
+                     Creates tables if missing            
+
+npm run dev          Runs: npx lite-server                ▶️ Old method (deprecated)
+                     Live-reload on port 3000            
+                     
+
+npm install          Installs packages from               ▶️ After git clone
+                     package.json & package-lock.json     
+                     Creates node_modules/               
+
+npm list             Shows installed packages             ▶️ Check what's installed
+                     Displays version tree                
+
+npm audit            Checks for security issues           ▶️ Before deployment
+                     Shows vulnerabilities                
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌳 DEPENDENCY TREE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+package.json
+├── express@4.18.2
+│   ├── accepts@1.3.8
+│   ├── body-parser@1.20.1
+│   ├── finalhandler@1.2.0
+│   ├── type-is@1.6.18
+│   └── ... (10+ dependencies)
+├── cors@2.8.5
+│   ├── object-assign@4.1.1
+│   └── vary@1.1.2
+├── sqlite3@5.1.6
+│   ├── sqlite@5.0.1 (native binding)
+│   └── ... (build-time dependencies)
+├── uuid@9.0.0 (no sub-dependencies)
+└── lite-server@2.6.1 (dev-only)
+
+Total: 158 packages with transitive dependencies
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 MINIMAL REQUIRED SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+To run this project, you MUST have:
+
+1. ✅ Node.js installed              (You have it: v23.5.0)
+   └─ Download: https://nodejs.org/
+
+2. ✅ npm installed                  (Comes with Node.js)
+   └─ Verify: npm --version
+
+3. ✅ Project files cloned/downloaded (You have it)
+   └─ Location: C:\Users\purna\OneDrive\Desktop\skill palwar\...
+
+4. ✅ npm dependencies installed     (Already done with: npm install)
+   └─ Verify: ls node_modules/
+
+5. ✅ Database seeded               (Already done with: npm run seed)
+   └─ Verify: exists movies.db (~50 KB)
+
+That's it! You're ready to go with:
+$ npm start
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 OPTIONAL TOOLS FOR DEVELOPMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tool                 Download Link                         Why Use It
+─────────────────────────────────────────────────────────────────────────────
+SQLite Browser       https://sqlitebrowser.org/            View & edit .db file
+                     (Desktop app)                         GUI for database
+
+Postman              https://www.postman.com/              Test API endpoints
+                     (Desktop app)                         Send requests, see responses
+
+DB Browser Portable  https://sqlitebrowser.org/dl/win64/   No installation version
+                     (Portable EXE)                        
+
+VS Code Extension    Extension: SQLite
+"SQLite" by alexcvzz https://marketplace.visualstudio.com/ View .db inside VS Code
+                                                            
+
+cURL / PowerShell     Built-in                             Test API from terminal
+                     (Already installed)                   
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📥 HOW TO DOWNLOAD OPTIONAL APPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+METHOD 1: Direct Download
+1. Go to https://sqlitebrowser.org/
+2. Click "Download" button
+3. Choose Windows version
+4. Run installer
+5. Add to Start menu
+
+METHOD 2: Using Chocolatey (if installed)
+$ choco install sqlite-browser
+
+METHOD 3: Microsoft Store (Recommended)
+1. Open Windows Store app
+2. Search "SQLite Browser"
+3. Click "Install"
+4. Available from Start menu
+
+METHOD 4: Portable (No Install)
+1. Download from: https://sqlitebrowser.org/dl/
+2. Save to: C:\Users\purna\Downloads\
+3. Run directly (no installation)
+4. Portable - can move files around
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 QUICK START (From Scratch)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Download Node.js (if not installed)
+   → https://nodejs.org/
+   → Download LTS version
+   → Run installer
+
+2. Open PowerShell or CMD
+
+3. Navigate to project
+   $ cd "c:\Users\purna\OneDrive\Desktop\skill palwar\movie-recommendation-system"
+
+4. Install dependencies
+   $ npm install
+
+5. Seed database (first time only)
+   $ npm run seed
+
+6. Start backend server
+   $ npm start
+   
+   ✓ Opens on http://localhost:5000
+
+7. Open browser
+   → http://localhost:5000
+   → See your app!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
