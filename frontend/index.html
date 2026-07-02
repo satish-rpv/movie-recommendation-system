@@ -1010,6 +1010,10 @@
       return moviesCopy.sort((a, b) => b.rating - a.rating);
     }
 
+    function getTrailerUrl(movie) {
+      return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${movie.title} trailer`)}`;
+    }
+
     function createMovieCard(movie, isWatchlistView = false) {
       const inWatchlist = isInWatchlist(movie.id);
       const isSeen = isMovieSeen(movie.id);
@@ -1026,6 +1030,7 @@
             }
             <button class="icon-btn ${isSeen ? "active" : ""}" aria-pressed="${isSeen}" aria-label="${isSeen ? 'Mark as unwatched' : 'Mark as seen'}: ${movie.title}">👁️</button>
             <button class="icon-btn details-btn" aria-expanded="false" aria-controls="${detailsId}" aria-label="Toggle details for ${movie.title}">🔍</button>
+            <button class="icon-btn trailer-btn" aria-label="Watch trailer for ${movie.title}">▶</button>
           </div>
           ${safeImage(movie)}
         </div>
@@ -1040,6 +1045,7 @@
           <div id="${detailsId}" class="movie-details" hidden>
             <p style="margin:8px 0;color:var(--muted);"><strong>Synopsis:</strong> ${movie.synopsis || 'No synopsis available.'}</p>
             <p style="margin:8px 0;color:var(--muted);font-size:0.9rem;"><strong>Release:</strong> ${movie.year} | <strong>Genre:</strong> ${movie.genre} | <strong>Rating:</strong> ${movie.rating}/10</p>
+            <p style="margin:8px 0 0;"><a href="${getTrailerUrl(movie)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent-2); text-decoration: underline; font-weight:700;">Watch trailer on YouTube</a></p>
           </div>
           <div class="rating-bar"><div class="rating-fill" style="width:${movie.rating * 10}%"></div></div>
         </div>
@@ -1083,15 +1089,21 @@
       const detailsBtn = card.querySelector('.details-btn');
       const detailsEl = card.querySelector('.movie-details');
       const titleEl = card.querySelector('.movie-title');
+      const trailerBtn = card.querySelector('.trailer-btn');
       function toggleDetails() {
         const expanded = detailsBtn.getAttribute('aria-expanded') === 'true';
         detailsBtn.setAttribute('aria-expanded', String(!expanded));
         detailsEl.hidden = expanded;
         if (!expanded) detailsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
+      function openTrailer() {
+        window.open(getTrailerUrl(movie), '_blank', 'noopener,noreferrer');
+      }
       detailsBtn.addEventListener('click', toggleDetails);
       detailsBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDetails(); } });
       titleEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDetails(); } });
+      trailerBtn.addEventListener('click', openTrailer);
+      trailerBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openTrailer(); } });
 
       return card;
     }
