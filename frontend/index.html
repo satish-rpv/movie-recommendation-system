@@ -865,6 +865,22 @@
     const genreChips = document.getElementById("genreChips");
     const spotlightWrap = document.getElementById("spotlightWrap");
 
+    function refreshAllViews() {
+      renderStats();
+      renderFeaturedModules();
+      applyFilters();
+      if (watchlistContainer.style.display !== "none") {
+        renderWatchlist();
+      }
+      renderActivity();
+    }
+
+    function logActivity(title, message, icon) {
+      const current = JSON.parse(localStorage.getItem("movie_activity_log") || "[]");
+      const updated = [{ title, message, icon }, ...current].slice(0, 6);
+      localStorage.setItem("movie_activity_log", JSON.stringify(updated));
+    }
+
     function isInWatchlist(id) {
       return watchlist.some(movie => movie.id === id);
     }
@@ -873,14 +889,13 @@
       try {
         if (isInWatchlist(movie.id)) {
           await api.removeFromWatchlist(movie.id);
+          logActivity(movie.title, "Removed from watchlist", "➖");
         } else {
           await api.addToWatchlist(movie.id);
+          logActivity(movie.title, "Added to watchlist", "❤️");
         }
         watchlist = await api.getWatchlist();
-        renderStats();
-        renderModules();
-        applyFilters();
-        renderWatchlist();
+        refreshAllViews();
       } catch (error) {
         console.error('Error toggling watchlist:', error);
         alert('Failed to update watchlist');
@@ -889,12 +904,13 @@
 
     async function removeFromWatchlist(id) {
       try {
+        const movie = watchlist.find(item => item.id === id) || movies.find(item => item.id === id);
         await api.removeFromWatchlist(id);
+        if (movie) {
+          logActivity(movie.title, "Removed from watchlist", "➖");
+        }
         watchlist = await api.getWatchlist();
-        renderStats();
-        renderModules();
-        applyFilters();
-        renderWatchlist();
+        refreshAllViews();
       } catch (error) {
         console.error('Error removing from watchlist:', error);
         alert('Failed to remove from watchlist');
@@ -903,10 +919,14 @@
 
     async function toggleSeen(id) {
       try {
+        const movie = movies.find(item => item.id === id);
         await api.toggleSeen(id);
+        if (movie) {
+          const currentlySeen = isMovieSeen(id);
+          logActivity(movie.title, currentlySeen ? "Marked as unwatched" : "Marked as seen", "👁️");
+        }
         seenMovies = await api.getSeen();
-        renderStats();
-        applyFilters();
+        refreshAllViews();
       } catch (error) {
         console.error('Error toggling seen:', error);
         alert('Failed to update seen status');
@@ -1028,7 +1048,7 @@
               ? `<button class="remove-btn" aria-label="Remove ${movie.title} from watchlist">✕ Remove</button>`
               : `<button class="icon-btn ${inWatchlist ? "active" : ""}" aria-pressed="${inWatchlist}" aria-label="${inWatchlist ? 'Remove' : 'Add'} ${movie.title} to watchlist">❤️</button>`
             }
-            <button class="icon-btn ${isSeen ? "active" : ""}" aria-pressed="${isSeen}" aria-label="${isSeen ? 'Mark as unwatched' : 'Mark as seen'}: ${movie.title}">👁️</button>
+            <button class="icon-btn seen-btn ${isSeen ? "active" : ""}" aria-pressed="${isSeen}" aria-label="${isSeen ? 'Mark as unwatched' : 'Mark as seen'}: ${movie.title}">👁️</button>
             <button class="icon-btn details-btn" aria-expanded="false" aria-controls="${detailsId}" aria-label="Toggle details for ${movie.title}">🔍</button>
             <button class="icon-btn trailer-btn" aria-label="Watch trailer for ${movie.title}">▶</button>
           </div>
@@ -1063,25 +1083,14 @@
       }
 
       // Seen toggle handler
-      const allIconBtns = card.querySelectorAll(".icon-btn:not(.details-btn)");
-      const seenBtn = allIconBtns[allIconBtns.length - 1]; // Eye button is always the last non-details icon-btn
+      const seenBtn = card.querySelector(".seen-btn");
       seenBtn.addEventListener("click", async () => {
         await toggleSeen(movie.id);
-        renderFeaturedModules();
-        applyFilters();
-        if (watchlistContainer.style.display !== "none") {
-          renderWatchlist();
-        }
       });
       seenBtn.addEventListener("keydown", async e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           await toggleSeen(movie.id);
-          renderFeaturedModules();
-          applyFilters();
-          if (watchlistContainer.style.display !== "none") {
-            renderWatchlist();
-          }
         }
       });
 
@@ -1146,6 +1155,40 @@
           </div>
         </div>
       `).join("");
+    }
+
+    function renderActivity() {
+      const panelId = "activityPanel";
+      const existingPanel = document.getElementById(panelId);
+      if (existingPanel) existingPanel.remove();
+
+      const log = JSON.parse(localStorage.getItem("movie_activity_log") || "[]");
+      const panel = document.createElement("div");
+      panel.className = "panel";
+      panel.id = panelId;
+      panel.innerHTML = `
+        <div class="section-header">
+          <div>
+            <h2 class="section-label">Recent activity</h2>
+            <p class="section-subtitle">Your latest watchlist and seen actions on this browser.</p>
+          </div>
+        </div>
+        ${log.length ? `
+          <div class="module-list">
+            ${log.slice(0, 6).map(item => `
+              <div class="module-item">
+                <div class="movie-poster-placeholder" style="width:44px;height:60px;font-size:1rem;">${item.icon}</div>
+                <div>
+                  <strong>${item.title}</strong>
+                  <span>${item.message}</span>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        ` : `<div class="no-results">No recent activity yet. Use ❤️ or 👁️ on a movie to build history.</div>`}
+      `;
+
+      moduleGrid.insertAdjacentElement("afterend", panel);
     }
 
     function createGenreSection(genre, list) {
@@ -1271,6 +1314,7 @@
     renderStats();
     renderFeaturedModules();
     applyFilters();
+    renderActivity();
 
     // Accessibility toggles
     if (contrastToggle) {
