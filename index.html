@@ -878,7 +878,7 @@
         }
         watchlist = await api.getWatchlist();
         renderStats();
-        renderModules();
+        renderFeaturedModules();
         applyFilters();
         renderWatchlist();
       } catch (error) {
@@ -892,7 +892,7 @@
         await api.removeFromWatchlist(id);
         watchlist = await api.getWatchlist();
         renderStats();
-        renderModules();
+        renderFeaturedModules();
         applyFilters();
         renderWatchlist();
       } catch (error) {
